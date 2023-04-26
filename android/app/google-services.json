@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "326189972796",
+    "project_id": "thanhs-hotel-booking-app",
+    "storage_bucket": "thanhs-hotel-booking-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326189972796:android:4654fab8eedd5f0e353239",
+        "android_client_info": {
+          "package_name": "com.ttmt.hotel_booking_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "326189972796-dao7sapm7roapu4vtph4m6fo68hq45vk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ttmt.hotel_booking_app",
+            "certificate_hash": "fe0ff96840f878145f6cb1e6048730a2c2e29805"
+          }
+        },
+        {
+          "client_id": "326189972796-dq8eji6kkakbnbs5g9rrbpc76ced1kv9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWS48ZrcDvnFijKGi8pcecsCuwjljGUEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "326189972796-dq8eji6kkakbnbs5g9rrbpc76ced1kv9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
