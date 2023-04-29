@@ -191,4 +191,17 @@ class _RegisterPageState extends State<RegisterPage> {
     showSnackBar(context: context, message: "Đã đăng ký tài khoản thành công!", duration: 2);
     Navigator.pop(context);
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    txtName.dispose();
+    txtPasswd.dispose();
+    txtRePasswd.dispose();
+    txtEmail.dispose();
+    txtBDay.dispose();
+    txtSDT.dispose();
+    txtAddress.dispose();
+    txtCCCD.dispose();
+  }
 }

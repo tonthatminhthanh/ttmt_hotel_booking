@@ -6,3 +6,30 @@ void showSnackBar({required BuildContext context, required String message, requi
     SnackBar(content: Text(message), duration: Duration(seconds: duration), backgroundColor: Colors.pinkAccent,)
   );
 }
+
+Future<bool?> showWarningDialog({required BuildContext context, required String msg}) async
+{
+  AlertDialog dialog = AlertDialog(
+    icon: Icon(Icons.warning, color: Colors.yellow),
+    content: Text(msg),
+    actions: [
+      ElevatedButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop(true);
+          },
+          child: Text("Đồng ý")),
+      ElevatedButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop(false);
+          },
+          child: Text("Hủy")),
+    ],
+  );
+
+  bool? confirm = await showDialog(context: context,
+      builder: (context) => dialog,
+      barrierDismissible: false
+  );
+
+  return confirm;
+}
