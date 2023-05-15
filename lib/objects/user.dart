@@ -22,7 +22,13 @@ class MyUser
         sdt: json["phone"] as String,
     );
   }
-
+  
+  String getNgaySinh()
+  {
+    var dob = DateTime.parse(ngaySinh!);
+    return dob.day.toString() + "/" + dob.month.toString() + "/" + dob.year.toString();
+  }
+  
   Map<String, dynamic> toJson()
   {
     return {

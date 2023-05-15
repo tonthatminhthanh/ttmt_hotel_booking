@@ -25,4 +25,12 @@ class UserSnapshot
   {
     return await documentReference!.update(user.toJson());
   }
+
+  static Stream<UserSnapshot> userFromFirebase(MyUser usr)
+  {
+    Stream<QuerySnapshot> qs = FirebaseFirestore.instance.collection("Users").where("email", isEqualTo: usr.email).snapshots();
+    Stream<DocumentSnapshot> streamDocSnap = qs.map((queryInfo) => queryInfo.docs.single);
+
+    return streamDocSnap.map((snapshot) => UserSnapshot.fromSnapshot(snapshot));
+  }
 }

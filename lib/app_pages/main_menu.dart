@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hotel_booking_app/app_pages/about_page.dart';
+import 'package:hotel_booking_app/app_pages/add_room.dart';
+import 'package:hotel_booking_app/app_pages/room_list.dart';
+import 'package:hotel_booking_app/app_pages/search_filter.dart';
+import 'package:hotel_booking_app/app_pages/sharing_page.dart';
+import 'package:hotel_booking_app/app_pages/support.dart';
+import 'package:hotel_booking_app/app_pages/user_profile_view.dart';
 import 'package:hotel_booking_app/firebase/firebase_user_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hotel_booking_app/objects/menu_tiles.dart';
 import 'package:hotel_booking_app/utilities/utilities.dart';
 
 class MainMenuPage extends StatefulWidget {
@@ -14,7 +22,11 @@ class MainMenuPage extends StatefulWidget {
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
+  int selectedTile = 0;
+  String? appBarTitle;
+  Widget? currentWidget;
   UserSnapshot? usr;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -24,13 +36,14 @@ class _MainMenuPageState extends State<MainMenuPage> {
         if(confirm!)
         {
           FirebaseAuth.instance.signOut();
+          Navigator.pop(context);
         }
         print(confirm);
-        Navigator.pop(context);
         return confirm;
       },
       child: Scaffold(
             appBar: AppBar(
+              title: Text("$appBarTitle"),
               actions: [
                 IconButton(
                     onPressed: () {
@@ -39,76 +52,56 @@ class _MainMenuPageState extends State<MainMenuPage> {
                     icon: Icon(Icons.notifications))
               ],
             ),
+            floatingActionButton: _assignFloatingWidget(index: selectedTile),
             drawer: Drawer(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserAccountsDrawerHeader(
-                      currentAccountPicture: usr?.user!.anh != null ? CircleAvatar(child: Image.network(usr!.user!.anh!),) :
-                      CircleAvatar(child: Icon(Icons.image_not_supported_outlined),),
-                      accountName: Text(usr!.user!.hoten!),
-                      accountEmail: Text(usr!.user!.email!)
-                  ),
+                  StreamBuilder(
+                    stream: UserSnapshot.userFromFirebase(usr!.user!),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasError)
+                          {
+                            return Icon(Icons.warning, color: Colors.red,);
+                          }
+                        else
+                          {
+                            if(!snapshot.hasData)
+                              {
+                                return CircularProgressIndicator();
+                              }
+                            else
+                              {
+                                var userSnap = snapshot.data;
+                                return UserAccountsDrawerHeader(
+                                    currentAccountPicture: userSnap?.user!.anh != null ? CircleAvatar(child: Image.network(userSnap!.user!.anh!),) :
+                                    CircleAvatar(child: Icon(Icons.image_not_supported_outlined),),
+                                    accountName: Text(userSnap!.user!.hoten!),
+                                    accountEmail: Text(userSnap!.user!.email!)
+                                );
+                              }
+                          }
+                      },),
                   Expanded(
-                      child: ListView(
-                        children: [
-                          GestureDetector(
+                      child: ListView.separated(
+                          itemBuilder: (context, index) => GestureDetector(
                             onTap: () {
-
+                              setState(() {
+                                selectedTile = index;
+                                appBarTitle = tileTitles[selectedTile];
+                                _assignWidget(index: index, user: usr!);
+                              });
                             },
                             child: ListTile(
-                              leading: Icon(Icons.search),
-                              title: Text("Tìm kiếm"),
+                              tileColor: selectedTile == index ? Colors.pinkAccent : Colors.white,
+                              textColor: selectedTile == index ? Colors.white : Colors.black,
+                              title: Text(tileTitles[index]),
+                              trailing: tileIcons[index],
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: ListTile(
-                              leading: Icon(Icons.house),
-                              title: Text("Danh sách phòng được đặt"),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: ListTile(
-                              leading: Icon(Icons.person),
-                              title: Text("Tài khoản của tôi"),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: ListTile(
-                              leading: Icon(Icons.share),
-                              title: Text("Mời bạn bè"),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: ListTile(
-                              leading: Icon(Icons.phone),
-                              title: Text("Gọi điện trợ giúp"),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-
-                            },
-                            child: ListTile(
-                              leading: Icon(Icons.corporate_fare),
-                              title: Text("Về chúng tôi"),
-                            ),
-                          ),
-                        ],
-                      )
+                          separatorBuilder: (context, index) => Divider(height: 2),
+                          itemCount: tileTitles.length)
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -122,6 +115,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 ],
               ),
             ),
+        body: currentWidget,
       ),
     );
   }
@@ -130,5 +124,49 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void initState() {
     super.initState();
     usr = widget.user;
+    appBarTitle = tileTitles[selectedTile];
+    _assignWidget(index: 0, user: usr!);
+  }
+
+  Widget? _assignFloatingWidget({required int index})
+  {
+    switch(index)
+    {
+      case 0:
+        return FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SearchFilter(),)
+              );
+            },
+            child: Icon(Icons.manage_search));
+      case 2:
+        return FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AddRoomPage(),)
+              );
+            },
+            child: Icon(Icons.add_business));
+      default:
+        return null;
+    }
+  }
+
+  void _assignWidget({required int index, required UserSnapshot user})
+  {
+    List<Widget> widgetList = [
+      RoomListPage(user: user, myRoom: false,),
+      Placeholder(),
+      RoomListPage(user: user, myRoom: true,),
+      UserProfileView(user: user),
+      SharePage(),
+      SupportPage(),
+      VeChungToi(),
+    ];
+
+    setState(() {
+      currentWidget = widgetList[index];
+    });
   }
 }
