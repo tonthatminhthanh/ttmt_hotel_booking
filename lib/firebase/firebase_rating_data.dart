@@ -17,7 +17,7 @@ class RatingSnapshot
         documentReference: snapshot.reference);
   }
 
-  static Future<DocumentReference> addUser(Rating rating) async
+  static Future<DocumentReference> addRating(Rating rating) async
   {
     return FirebaseFirestore.instance.collection("Ratings").add(rating.toJson());
   }
@@ -48,7 +48,9 @@ class RatingSnapshot
     for(DocumentSnapshot snapshot in snapshot.docs)
       {
         totalScore += snapshot["score"] as int;
+        print("Điểm: ${totalScore}");
       }
+    print("Điểm tb: ${totalScore / snapshot.docs.length}");
     return totalScore / snapshot.docs.length;
   }
 }

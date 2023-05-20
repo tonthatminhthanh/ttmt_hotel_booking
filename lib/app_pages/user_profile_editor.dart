@@ -174,7 +174,6 @@ class _UserEditorPageState extends State<UserEditorPage> {
     });
 
     setState(() {
-      file = file;
       imageUrl = imageUrl;
     });
   }

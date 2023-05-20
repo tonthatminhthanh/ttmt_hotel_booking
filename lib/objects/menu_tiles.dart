@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hotel_booking_app/app_pages/room_list.dart';
 
 List<String> tileTitles = [
-  "Tìm kiếm",
+  "Trang chủ",
   "Danh sách phòng được đặt",
   "Danh sách phòng cho thuê",
   "Tài khoản của tôi",

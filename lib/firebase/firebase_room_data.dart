@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hotel_booking_app/app_pages/search_filter.dart';
 import 'package:hotel_booking_app/objects/room.dart';
+import 'package:hotel_booking_app/objects/search.dart';
 import 'package:hotel_booking_app/objects/user.dart';
 
 class RoomSnapshot
@@ -26,7 +28,17 @@ class RoomSnapshot
 
   static Stream<List<RoomSnapshot>> listFromFirebase()
   {
-    Stream<QuerySnapshot> streamQS = FirebaseFirestore.instance.collection("Rooms").snapshots();
+    Stream<QuerySnapshot> streamQS = FirebaseFirestore.instance.collection("Rooms")
+        .snapshots();
+    Stream<List<DocumentSnapshot>> streamListDocSnap = streamQS.map(
+            (queryInfo) => queryInfo.docs);
+    return streamListDocSnap.map((listDS) => listDS.map((ds) => RoomSnapshot.fromSnapshot(ds)).toList()
+    );
+  }
+
+  static Stream<List<RoomSnapshot>> rentListFromFirebase(MyUser user)
+  {
+    Stream<QuerySnapshot> streamQS = FirebaseFirestore.instance.collection("Rooms").where("buyer_email",isEqualTo: user.email).snapshots();
     Stream<List<DocumentSnapshot>> streamListDocSnap = streamQS.map(
             (queryInfo) => queryInfo.docs);
     return streamListDocSnap.map((listDS) => listDS.map((ds) => RoomSnapshot.fromSnapshot(ds)).toList()
@@ -40,5 +52,10 @@ class RoomSnapshot
             (queryInfo) => queryInfo.docs);
     return streamListDocSnap.map((listDS) => listDS.map((ds) => RoomSnapshot.fromSnapshot(ds)).toList()
     );
+  }
+
+  Future<void> xoa() async
+  {
+    return documentReference!.delete();
   }
 }

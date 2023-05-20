@@ -11,7 +11,6 @@ class SearchFilter extends StatefulWidget {
 class _SearchFilterState extends State<SearchFilter> {
   GlobalKey _formKey = GlobalKey<FormState>();
   String? defaultCity;
-  String? defaultStar;
 
   @override
   Widget build(BuildContext context) {
@@ -40,29 +39,12 @@ class _SearchFilterState extends State<SearchFilter> {
                     });
                     MyFilter.setCity(city: value!);
                   },),
-              DropdownButtonFormField<String>(
-                value: defaultStar,
-                items: starOptions.map((rating)
-                => DropdownMenuItem<String>(
-                  child: Text(rating), value: rating,)
-                ).toList(),
-                decoration: InputDecoration(
-                    labelText: "Đánh giá"
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    defaultStar = value;
-                  });
-                  MyFilter.setStars(star: starOptions.indexOf(value!));
-                },),
               TextButton(
                   onPressed: () {
                     setState(() {
                       defaultCity = cities[0];
-                      defaultStar = starOptions[0];
                     });
                     MyFilter.setCity(city: cities[0]);
-                    MyFilter.setStars(star: starOptions.indexOf(starOptions[0]));
                   },
                   child: Text("Đặt lại"))
             ],
@@ -76,6 +58,5 @@ class _SearchFilterState extends State<SearchFilter> {
   void initState() {
     super.initState();
     defaultCity = MyFilter().city != null ? MyFilter().city! : cities[0];
-    defaultStar = MyFilter().stars != null ? starOptions[MyFilter().stars!] : starOptions[0];
   }
 }

@@ -144,7 +144,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         return FloatingActionButton(
             onPressed: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => AddRoomPage(),)
+                  MaterialPageRoute(builder: (context) => AddRoomPage(user: usr!),)
               );
             },
             child: Icon(Icons.add_business));
@@ -156,9 +156,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
   void _assignWidget({required int index, required UserSnapshot user})
   {
     List<Widget> widgetList = [
-      RoomListPage(user: user, myRoom: false,),
-      Placeholder(),
-      RoomListPage(user: user, myRoom: true,),
+      RoomListPage(user: user, myRoom: false,myRent: false),
+      RoomListPage(user: user, myRoom: false,myRent: true),
+      RoomListPage(user: user, myRoom: true,myRent: false),
       UserProfileView(user: user),
       SharePage(),
       SupportPage(),

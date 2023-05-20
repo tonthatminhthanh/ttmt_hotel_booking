@@ -21,26 +21,49 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
   UserSnapshot? user, seller;
   RoomSnapshot? roomSnapshot;
   RatingSnapshot? ratingSnapshot;
-  int? currRating;
+  double? currRating;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("${roomSnapshot!.room.title}"),
       ),
+      floatingActionButton: roomSnapshot!.room!.email != user!.user!.email ? (
+        roomSnapshot!.room!.buyerEmail != null ? FloatingActionButton(
+          onPressed: () {
+        roomSnapshot?.capNhat(roomSnapshot!.room.rent(null));
+    Navigator.pop(context);
+    },
+    child: Icon(Icons.remove),
+    ) : FloatingActionButton(
+          onPressed: () {
+            roomSnapshot?.capNhat(roomSnapshot!.room.rent(user!.user!.email));
+            Navigator.pop(context);
+          },
+          child: Icon(Icons.add),
+        )
+      ) : FloatingActionButton(
+        onPressed: () {
+          roomSnapshot!.xoa();
+          Navigator.pop(context);
+        },
+        child: Icon(Icons.remove),
+      ),
       body: SingleChildScrollView(
         child: seller == null ? Center(
           child:
-            CircularProgressIndicator(),
+          CircularProgressIndicator(),
         ) : Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CarouselSlider(
                 items: roomSnapshot!.room.photos.map(
-                        (item) => PhotoView(
-                        imageProvider: NetworkImage(item)
-                    )
+                        (item) =>
+                        PhotoView(
+                            imageProvider: NetworkImage(item)
+                        )
                 ).toList(),
                 options: CarouselOptions(
                     autoPlay: true,
@@ -49,61 +72,74 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
                 )
             ),
             Text("${roomSnapshot!.room.title}", style: TextStyle(
-                color: Colors.pinkAccent, fontSize: 24, fontWeight: FontWeight.bold),
+                color: Colors.pinkAccent,
+                fontSize: 24,
+                fontWeight: FontWeight.bold),
             ),
             Text("Người cho thuê: ${seller!.user!.hoten}", style: TextStyle(
-                color: Colors.pinkAccent, fontSize: 16, fontWeight: FontWeight.bold),
+                color: Colors.pinkAccent,
+                fontSize: 16,
+                fontWeight: FontWeight.bold),
             ),
             Text("Thông tin liên hệ:", style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold)),
             Text("Email: ${seller!.user!.email}", style: TextStyle(
-                fontSize: 16,)),
+              fontSize: 16,)),
             Text("Số điện thoại: ${seller!.user!.sdt}", style: TextStyle(
               fontSize: 16,)),
-            Text("Giá: ${roomSnapshot!.room.gia}/${roomSnapshot!.room.thoiGian}", style: TextStyle(
-                color: Colors.pinkAccent, fontSize: 24),
+            roomSnapshot!.room.buyerEmail == user!.user!.email ? Text("Đánh giá cá nhân", style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold)) : Text("Đánh giá:", style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold)),
+            roomSnapshot!.room.buyerEmail == user!.user!.email ? Row(
+                children:
+                List.generate(5, (index) => IconButton(
+                    onPressed: () async {
+                      setState(() {
+                        currRating = index + 1;
+                      });
+                      if (ratingSnapshot == null) {
+                        Rating rating = Rating(
+                            userId: user!.documentReference!.id,
+                            roomId: roomSnapshot!.documentReference!.id,
+                            score: currRating!.round()
+                        );
+                        DocumentReference docRef = await RatingSnapshot
+                            .addRating(rating);
+                        ratingSnapshot = RatingSnapshot(
+                            rating: rating, documentReference: docRef);
+                      }
+                      else {
+                        ratingSnapshot!.capNhat(Rating(
+                            userId: user!.documentReference!.id,
+                            roomId: roomSnapshot!.documentReference!.id,
+                            score: currRating!.round()
+                        ));
+                      }
+                    },
+                    icon: currRating != null && (index + 1) <= currRating!
+                        ? Icon(Icons.star, color: Colors.pinkAccent,) :
+                    Icon(Icons.star_border_outlined, color: Colors.black,)
+                ))
+            ) : Row(
+              children: List.generate(5,
+                      (index) => currRating != null && (index + 1) <= currRating!
+                      ? Icon(Icons.star, color: Colors.pinkAccent,) :
+                  Icon(Icons.star_border_outlined, color: Colors.black,)
+                /**/
+              ),
+            ),
+            Text(
+              "Giá: ${roomSnapshot!.room.gia}/${roomSnapshot!.room.thoiGian}",
+              style: TextStyle(
+                  color: Colors.pinkAccent, fontSize: 24),
             ),
             Text("Địa chỉ: ${roomSnapshot!.room.diaChi}", style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            Text("Đánh giá của bạn:", style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold)),
-            Row(
-              children: List.generate(5,
-                      (index) => IconButton(
-                          onPressed: () async {
-                            setState(() {
-                              currRating = index + 1;
-                            });
-                            if(ratingSnapshot == null)
-                            {
-                              Rating rating = Rating(
-                                  userId: user!.documentReference!.id,
-                                  roomId: roomSnapshot!.documentReference!.id,
-                                  score: currRating!
-                              );
-                              DocumentReference docRef = await RatingSnapshot.addUser(rating);
-                              ratingSnapshot = RatingSnapshot(rating: rating, documentReference: docRef);
-                            }
-                            else
-                            {
-                              ratingSnapshot!.capNhat(Rating(
-                                  userId: user!.documentReference!.id,
-                                  roomId: roomSnapshot!.documentReference!.id,
-                                  score: currRating!
-                              ));
-                            }
-                          },
-                          icon: currRating != null && (index + 1) <= currRating!
-                              ? Icon(Icons.star, color: Colors.pinkAccent,) :
-                          Icon(Icons.star_border_outlined, color: Colors.black,)
-                      )
-              ),
-            ),
             Text("Thông tin chi tiết:", style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.bold)),
             Text(roomSnapshot!.room.thongTin, style: TextStyle(
-                fontSize: 16))
+                fontSize: 16)),
           ],
         ),
       ),
@@ -116,24 +152,26 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
     user = widget.user;
     roomSnapshot = widget.roomSnapshot;
     _getSellerInfo();
-    _getMyRatingInfo();
+    _getAverageRating();
+    print(currRating);
   }
 
   void _getSellerInfo() async
   {
-    var users = await FirebaseFirestore.instance.collection("Users").where("email", isEqualTo: roomSnapshot!.room.email)
+    var users = await FirebaseFirestore.instance.collection("Users").where(
+        "email", isEqualTo: roomSnapshot!.room.email)
         .limit(1)
         .get().then((event) {
-      if(event.docs.isNotEmpty) {
+      if (event.docs.isNotEmpty) {
         UserSnapshot snapshot = UserSnapshot.fromSnapshot(event.docs.single);
         setState(() {
           seller = snapshot;
         });
       }
-        });
+    });
   }
 
-  void _getMyRatingInfo() async
+/*void _getMyRatingInfo() async
   {
     var snapshot = await RatingSnapshot.getSnapshot(userId: user!.documentReference!.id,
         roomId: roomSnapshot!.documentReference.id);
@@ -142,5 +180,11 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
         ratingSnapshot = RatingSnapshot.fromSnapshot(snapshot);
         currRating = ratingSnapshot!.rating.score;
       }
-  }
+  }*/
+    void _getAverageRating() async
+    {
+      currRating = await RatingSnapshot.getAverageScore(roomId: roomSnapshot!.documentReference!.id!);
+    }
+
+
 }

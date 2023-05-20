@@ -7,8 +7,8 @@ import 'package:hotel_booking_app/objects/search.dart';
 
 class RoomListPage extends StatefulWidget {
   UserSnapshot user;
-  bool myRoom;
-  RoomListPage({Key? key, required this.user, required this.myRoom}) : super(key: key);
+  bool myRoom, myRent;
+  RoomListPage({Key? key, required this.user, required this.myRoom, required this.myRent}) : super(key: key);
 
   @override
   State<RoomListPage> createState() => _RoomListPageState();
@@ -21,7 +21,8 @@ class _RoomListPageState extends State<RoomListPage> {
   Widget build(BuildContext context) {
     return StreamBuilder<List<RoomSnapshot>>(
       stream: widget.myRoom ? RoomSnapshot.myListFromFirebase(user!.user!)
-          : RoomSnapshot.listFromFirebase(),
+          : widget.myRent ? RoomSnapshot.rentListFromFirebase(user!.user!) :
+      RoomSnapshot.listFromFirebase(),
         builder: (context, snapshot) {
           if(snapshot.hasError)
             {
@@ -47,57 +48,11 @@ class _RoomListPageState extends State<RoomListPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      TextFormField(
-                        controller: txtSearch,
-                        textInputAction: TextInputAction.search,
-                        onFieldSubmitted: (value) {
-                          MyFilter.setSearch(search: value);
-                          print(MyFilter().search);
-                        },
-                        decoration: InputDecoration(
-                          labelText: "Tìm kiếm",
-                          icon: Icon(Icons.search)
-                        ),
-                      ),
                       Flexible(
                           child: ListView.separated(
-                              itemBuilder: (context, index)
-                              => Padding(
-                                padding: const EdgeInsets.only(left: 8.0, right: 8.0,),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(flex: 1, child: Image.network(list[index].room!.photos[0])),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context,
-                                                MaterialPageRoute(
-                                                  builder: (context)
-                                                  => RoomDetailsPage(
-                                                      user: user!,
-                                                      roomSnapshot: list[index]),
-                                                )
-                                            );
-                                          },
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(list[index].room!.title, style: TextStyle(fontSize: 20, color: Colors.pinkAccent),),
-                                              Text("Tại: ${list[index].room!.thanhPho}", style: TextStyle(fontSize: 16)),
-                                              Text("Giá: ${list[index].room!.gia}VND/${list[index].room!.thoiGian}", style: TextStyle(fontSize: 20, color: Colors.pinkAccent),),
-                                              Text("Liên hệ: ${list[index].room!.email}")
-                                            ],
-                                          )
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
+                              itemBuilder: (context, index) {
+                                return getItem(context, list, index);
+                              } ,
                               separatorBuilder: (context, index) => Divider(height: 2,),
                               itemCount: list.length)
                       )
@@ -113,5 +68,46 @@ class _RoomListPageState extends State<RoomListPage> {
   void initState() {
     super.initState();
     user = widget.user;
+    MyFilter().city = cities[0];
+  }
+
+  Widget getItem(BuildContext context, List<RoomSnapshot> list, int index)
+  {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0,),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(flex: 1, child: Image.network(list[index].room!.photos[0], width: 100,height: 100,)),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(
+                          builder: (context)
+                          => RoomDetailsPage(
+                              user: user!,
+                              roomSnapshot: list[index]),
+                        )
+                    );
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(list[index].room!.title, style: TextStyle(fontSize: 20, color: Colors.pinkAccent),),
+                      Text("Tại: ${list[index].room!.thanhPho}", style: TextStyle(fontSize: 16)),
+                      Text("Giá: ${list[index].room!.gia}VND/${list[index].room!.thoiGian}", style: TextStyle(fontSize: 20, color: Colors.pinkAccent),),
+                      widget.myRoom && list[index].room.buyerEmail != null ? Text("Liên hệ người thuê: ${list[index].room!.buyerEmail}") : Text("Liên hệ: ${list[index].room!.email}")
+                    ],
+                  )
+              )
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

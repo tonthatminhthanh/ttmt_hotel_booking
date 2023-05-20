@@ -1,11 +1,12 @@
 class Room
 {
   String title, email, thanhPho, thoiGian, thongTin, diaChi;
+  String? buyerEmail;
   int gia;
   List<dynamic> photos;
 
   Room({required this.title, required this.email, required this.thanhPho, required this.thoiGian, required this.thongTin,
-    required this.diaChi, required this.gia, required this.photos});
+    required this.diaChi, required this.gia, required this.photos, this.buyerEmail});
 
   factory Room.fromJson(Map<String, dynamic> json)
   {
@@ -18,6 +19,7 @@ class Room
         diaChi: json["diachi"] as String,
         gia: json["gia"] as int,
         photos: json["photos"] as List<dynamic>,
+        buyerEmail: json["buyer_email"] as String?
     );
   }
 
@@ -32,6 +34,13 @@ class Room
       "diachi": diaChi,
       "gia": gia,
       "photos": photos,
+      "buyer_email": buyerEmail
     };
+  }
+
+  Room rent(String? buyerEmail)
+  {
+    this.buyerEmail = buyerEmail;
+    return this;
   }
 }
