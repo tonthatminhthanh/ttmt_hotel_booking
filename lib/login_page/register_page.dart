@@ -181,14 +181,15 @@ class _RegisterPageState extends State<RegisterPage> {
         diaChi: txtAddress.text,
         ngaySinh: txtBDay.text,
     );
-
+    bool success = true;
     var user = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(
         email: txtEmail.text,
         password: txtPasswd.text
-    ).catchError((e) {showSnackBar(context: context, message: "Lỗi: ${e.toString()}", duration: 2);})
+    ).catchError((e) {showSnackBar(context: context, message: "Lỗi: ${e.toString()}", duration: 2);success = false;})
         .then((value) => UserSnapshot.addUser(newUser));
-    showSnackBar(context: context, message: "Đã đăng ký tài khoản thành công!", duration: 2);
+    if(success)
+      showSnackBar(context: context, message: "Đã đăng ký tài khoản thành công!", duration: 2);
     Navigator.pop(context);
   }
 
