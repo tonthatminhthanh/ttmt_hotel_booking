@@ -187,7 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
         email: txtEmail.text,
         password: txtPasswd.text
     ).catchError((e) {showSnackBar(context: context, message: "Lỗi: ${e.toString()}", duration: 2);})
-        .whenComplete(() => UserSnapshot.addUser(newUser));
+        .then((value) => UserSnapshot.addUser(newUser));
     showSnackBar(context: context, message: "Đã đăng ký tài khoản thành công!", duration: 2);
     Navigator.pop(context);
   }
