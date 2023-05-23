@@ -44,13 +44,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
       child: Scaffold(
             appBar: AppBar(
               title: Text("$appBarTitle"),
-              actions: [
-                IconButton(
-                    onPressed: () {
-
-                    },
-                    icon: Icon(Icons.notifications))
-              ],
             ),
             floatingActionButton: _assignFloatingWidget(index: selectedTile),
             drawer: Drawer(

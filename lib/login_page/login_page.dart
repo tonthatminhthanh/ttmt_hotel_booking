@@ -77,19 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 child: Text("Đăng nhập")
             ),
-            SizedBox(height: 5,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                    onPressed: () {
-
-                      },
-                    icon: Image.asset("media/google_icon.png")
-                ),
-              ],
-            )
           ],
         ),
       ),
